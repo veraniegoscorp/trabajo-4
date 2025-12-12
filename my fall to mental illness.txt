@@ -1,0 +1,73 @@
+"""i'm tired just please let me rest for once in a while man :c
+
+
+the tables in the bd whit the sequence it is cliente carrito and item_carrito 
+important for the logic and don't forget it plz man
+
+i'm gonna leave the scrip of the bd just in case it is needed for someone that it's reading this
+
+
+drop table carrito;
+drop table cliente;
+drop table item_carrito;
+drop table producto;
+
+--secuencias (porque en el visual studio si generamos los ids desde ahi nos hacen kk jsjs)
+CREATE SEQUENCE seq_cliente   START WITH 1 INCREMENT BY 1 ;
+CREATE SEQUENCE seq_carrito   START WITH 1 INCREMENT BY 1 ;
+CREATE SEQUENCE seq_item      START WITH 1 INCREMENT BY 1 ;
+
+CREATE TABLE producto (
+    codigo_producto  NUMBER(10)     CONSTRAINT pk_producto PRIMARY KEY,
+    nombre            VARCHAR2(100)  NOT NULL,
+    precio_neto       NUMBER(12,2)   NOT NULL CHECK (PRECIO_NETO > 0),
+    estado          VARCHAR2(20)   DEFAULT 'ACTIVO' CHECK (ESTADO IN ('ACTIVO', 'INACTIVO'))
+);
+
+
+CREATE TABLE cliente (
+    id_cliente        NUMBER(10)     CONSTRAINT pk_cliente PRIMARY KEY,
+    rut               VARCHAR2(12)   NOT NULL UNIQUE,
+    nombre            VARCHAR2(100)  NOT NULL,
+    email            VARCHAR2(100)  NOT NULL UNIQUE,
+    contraseña_hash   VARCHAR2(255)  NOT NULL,
+    nivel             VARCHAR2(20)   DEFAULT 'General' CHECK (NIVEL IN ('General', 'estudiante')),
+    fecha_registro    DATE           DEFAULT SYSDATE NOT NULL
+);
+
+
+
+CREATE TABLE carrito (
+    id_carrito        NUMBER(10)     CONSTRAINT pk_carrito PRIMARY KEY,
+    id_cliente        NUMBER(10)     NOT NULL,
+    fecha_creacion    DATE           DEFAULT SYSDATE NOT NULL,
+    subtotal          NUMBER(12,2)   DEFAULT 0,
+    descuento_aplicado NUMBER(12,2)  DEFAULT 0,
+    total             NUMBER(12,2)   DEFAULT 0,
+    
+    CONSTRAINT fk_carrito_cliente 
+        FOREIGN KEY (ID_CLIENTE) REFERENCES CLIENTE(ID_CLIENTE)
+        ON DELETE CASCADE
+);
+
+
+
+
+
+
+
+
+CREATE TABLE ITEM_CARRITO (
+    ID_ITEM           NUMBER(10)     CONSTRAINT pk_item_carrito PRIMARY KEY,
+    ID_CARRITO        NUMBER(10)     NOT NULL,
+    CODIGO_PRODUCTO   NUMBER(10)     NOT NULL,
+    CANTIDAD          NUMBER(5)      DEFAULT 1 CHECK (CANTIDAD > 0),
+    SUBTOTAL_ITEM     NUMBER(12,2)   DEFAULT 0,
+    
+    CONSTRAINT fk_item_carrito 
+        FOREIGN KEY (ID_CARRITO) REFERENCES CARRITO(ID_CARRITO)
+        ON DELETE CASCADE,
+        
+    CONSTRAINT fk_item_producto 
+        FOREIGN KEY (CODIGO_PRODUCTO) REFERENCES PRODUCTO(CODIGO_PRODUCTO)
+);
